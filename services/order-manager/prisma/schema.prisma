@@ -1,0 +1,188 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["p2p", "public"]
+}
+
+model InventarioCapital {
+  id               Int      @id @default(autoincrement())
+  asset            String   @db.VarChar(10)
+  balanceAvailable Decimal  @map("balance_available") @db.Decimal(18, 8) @default(0)
+  balanceLocked    Decimal  @map("balance_locked") @db.Decimal(18, 8) @default(0)
+  lastUpdated      DateTime @default(now()) @map("last_updated")
+
+  @@map("inventariocapital")
+  @@schema("p2p")
+}
+
+model AnunciosPropios {
+  adId        String   @id @map("ad_id") @db.VarChar(50)
+  asset       String   @db.VarChar(10)
+  fiat        String   @db.VarChar(10)
+  tradeType   String   @map("trade_type") @db.VarChar(10)
+  price       Decimal  @db.Decimal(18, 8)
+  status      String   @db.VarChar(20)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  transacciones TransaccionesEjecutadas[]
+
+  @@map("anunciospropios")
+  @@schema("p2p")
+}
+
+model TransaccionesEjecutadas {
+  orderId      String          @id @map("order_id") @db.VarChar(50)
+  adId         String?         @map("ad_id") @db.VarChar(50)
+  amount       Decimal         @db.Decimal(18, 8)
+  totalPrice   Decimal         @map("total_price") @db.Decimal(18, 8)
+  counterparty String?         @db.VarChar(100)
+  status       String          @db.VarChar(20)
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  anuncio      AnunciosPropios? @relation(fields: [adId], references: [adId])
+
+  @@map("transaccionesejecutadas")
+  @@schema("p2p")
+}
+
+model CommunityUser {
+  id                  Int      @id @default(autoincrement())
+  alias               String   @db.VarChar(100)
+  email               String?  @db.VarChar(100) @unique
+  password            String?  @db.VarChar(255)
+  role                String   @db.VarChar(20) @default("INVESTOR") // ADMIN, INVESTOR
+  isSimulation        Boolean  @map("is_simulation") @default(false)
+  virtualPnl          Decimal  @map("virtual_pnl") @db.Decimal(18, 8) @default(0)
+  btcVirtualPnl       Decimal  @map("btc_virtual_pnl") @db.Decimal(18, 8) @default(0)
+  ethVirtualPnl       Decimal  @map("eth_virtual_pnl") @db.Decimal(18, 8) @default(0)
+  solVirtualPnl       Decimal  @map("sol_virtual_pnl") @db.Decimal(18, 8) @default(0)
+  xrpVirtualPnl       Decimal  @map("xrp_virtual_pnl") @db.Decimal(18, 8) @default(0)
+  capitalAllocated    Decimal  @map("capital_allocated") @db.Decimal(18, 8) @default(0) // Mantenido para retrocompatibilidad/UI Total temporal
+  btcCapitalAllocated Decimal  @map("btc_capital_allocated") @db.Decimal(18, 8) @default(0)
+  ethCapitalAllocated Decimal  @map("eth_capital_allocated") @db.Decimal(18, 8) @default(0)
+  solCapitalAllocated Decimal  @map("sol_capital_allocated") @db.Decimal(18, 8) @default(0)
+  xrpCapitalAllocated Decimal  @map("xrp_capital_allocated") @db.Decimal(18, 8) @default(0)
+  bnbCapitalAllocated Decimal  @map("bnb_capital_allocated") @db.Decimal(18, 8) @default(0)
+  btcOffset           Decimal  @map("btc_offset") @db.Decimal(18, 8) @default(0)
+  ethOffset           Decimal  @map("eth_offset") @db.Decimal(18, 8) @default(0)
+  solOffset           Decimal  @map("sol_offset") @db.Decimal(18, 8) @default(0)
+  xrpOffset           Decimal  @map("xrp_offset") @db.Decimal(18, 8) @default(0)
+  bnbOffset           Decimal  @map("bnb_offset") @db.Decimal(18, 8) @default(0)
+  btcEnabled          Boolean  @map("btc_enabled") @default(true)
+  ethEnabled          Boolean  @map("eth_enabled") @default(false)
+  solEnabled          Boolean  @map("sol_enabled") @default(false)
+  xrpEnabled          Boolean  @map("xrp_enabled") @default(false)
+  bnbEnabled          Boolean  @map("bnb_enabled") @default(false)
+  indexEnabled        Boolean  @map("index_enabled") @default(false)
+  indexCapitalAllocated Decimal @map("index_capital_allocated") @db.Decimal(18, 8) @default(0)
+  indexOffset         Decimal  @map("index_offset") @db.Decimal(18, 8) @default(0)
+  p2pEnabled          Boolean  @map("p2p_enabled") @default(false)
+  p2pUsdtBalance      Decimal  @map("p2p_usdt_balance") @db.Decimal(18, 8) @default(0)
+  status              String   @db.VarChar(20) @default("ACTIVE") // ACTIVE, INACTIVE, PAUSED
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @default(now()) @map("updated_at")
+
+  bybitKeys               BybitKey[]
+  indexHistory            IndexPerformanceHistory[]
+  indexInvestmentRequests IndexInvestmentRequest[]
+  indexPositions          IndexPosition[]
+  p2pOrdersAssigned       BybitP2pOrder[]
+
+  @@map("community_user")
+  @@schema("p2p")
+}
+
+model BybitKey {
+  id               Int      @id @default(autoincrement())
+  userId           Int      @map("user_id") @unique
+  apiKey           String   @map("api_key") @db.VarChar(100)
+  apiSecretEnc     String   @map("api_secret_enc") @db.Text
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @default(now()) @map("updated_at")
+
+  user             CommunityUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("bybit_key")
+  @@schema("p2p")
+}
+
+model IndexPerformanceHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  navTotal  Decimal  @map("nav_total") @db.Decimal(18, 8) // Valor liquidativo del portafolio Spot del user
+  date      DateTime @default(now()) @db.Date
+
+  user      CommunityUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("index_performance_history")
+  @@schema("p2p")
+}
+
+model IndexQuoteHistory {
+  id        Int      @id @default(autoincrement())
+  price     Decimal  @db.Decimal(18, 8)
+  date      DateTime @default(now()) @db.Date
+
+  @@map("index_quote_history")
+  @@schema("p2p")
+}
+
+model IndexInvestmentRequest {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  amountUSDT    Decimal  @map("amount_usdt") @db.Decimal(18, 8)
+  txHash        String?  @map("tx_hash") @db.VarChar(255)
+  name          String?  @db.VarChar(100)
+  whatsapp      String?  @db.VarChar(50)
+  type          String   @db.VarChar(20) @default("INVESTMENT") // INVESTMENT, WITHDRAWAL
+  walletAddress String?  @map("wallet_address") @db.VarChar(255)
+  status        String   @db.VarChar(20) @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user        CommunityUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("index_investment_request")
+  @@schema("p2p")
+}
+
+model IndexPosition {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
+  sharesAllocated Decimal  @map("shares_allocated") @db.Decimal(18, 8)
+  entryPrice      Decimal  @map("entry_price") @db.Decimal(18, 8)
+  capitalInvested Decimal  @map("capital_invested") @db.Decimal(18, 8)
+  entryDate       DateTime @default(now()) @map("entry_date")
+
+  user            CommunityUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("index_position")
+  @@schema("p2p")
+}
+
+model BybitP2pOrder {
+  id              Int      @id @default(autoincrement())
+  bybitOrderId    String   @map("bybit_order_id") @unique @db.VarChar(50)
+  amountFiat      Decimal  @map("amount_fiat") @db.Decimal(18, 8)
+  amountUsdt      Decimal  @map("amount_usdt") @db.Decimal(18, 8)
+  price           Decimal  @db.Decimal(18, 8)
+  fiatCurrency    String   @map("fiat_currency") @db.VarChar(10) @default("VES")
+  status          String   @db.VarChar(30) @default("PENDING_ASSIGNMENT") // PENDING_ASSIGNMENT, ASSIGNED, PAYMENT_SENT, COMPLETED, CANCELLED
+  retailName      String?  @map("retail_name") @db.VarChar(150)
+  bankDetails     String?  @map("bank_details") @db.Text
+  assignedUserId  Int?     @map("assigned_user_id")
+  lockedAt        DateTime? @map("locked_at")
+  reminderSent    Boolean  @default(false) @map("reminder_sent")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  assignedUser    CommunityUser? @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
+
+  @@map("bybit_p2p_order")
+  @@schema("p2p")
+}

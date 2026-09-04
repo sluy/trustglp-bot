@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+
+  # ─── INFRAESTRUCTURA ─────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: ${CLIENT_SLUG:-telecambios-ve}_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-p2p_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-p2p_core}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-p2p_admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ${CLIENT_SLUG:-telecambios-ve}_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── BACKEND: ORDER MANAGER ──────────────────────────────────
+  order-manager:
+    build:
+      context: ./services/order-manager
+      dockerfile: Dockerfile
+    container_name: ${CLIENT_SLUG:-telecambios-ve}_order_manager
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-p2p_admin}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-p2p_core}
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3000:3000"
+    volumes:
+      - config_data:/app/platform-config.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ─── BACKEND: P2P MARKETPLACE ────────────────────────────────
+  p2p-marketplace:
+    build:
+      context: ./services/p2p-marketplace
+      dockerfile: Dockerfile
+    container_name: ${CLIENT_SLUG:-telecambios-ve}_p2p_marketplace
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ─── BACKEND: MARKET SCANNER ─────────────────────────────────
+  market-scanner:
+    build:
+      context: ./services/market-scanner
+      dockerfile: Dockerfile
+    container_name: ${CLIENT_SLUG:-telecambios-ve}_market_scanner
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+
+  # ─── FRONTEND: ADMIN DASHBOARD ───────────────────────────────
+  admin-dashboard:
+    build:
+      context: ./apps/admin-dashboard
+      dockerfile: Dockerfile
+    container_name: ${CLIENT_SLUG:-telecambios-ve}_dashboard
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NEXT_PUBLIC_API_URL: http://order-manager:3000
+    ports:
+      - "3001:3000"
+    depends_on:
+      - order-manager
+
+  # ─── MÓDULO ADICIONAL: AUTO-PAY BOT ─────────────────────────
+  # Activar con: docker compose --profile optional up
+  auto-pay-bot:
+    build:
+      context: ./services/auto-pay-bot
+      dockerfile: Dockerfile
+    container_name: ${CLIENT_SLUG:-telecambios-ve}_auto_pay
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - order-manager
+
+volumes:
+  postgres_data:
+  redis_data:
+  config_data:

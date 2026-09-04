@@ -1,0 +1,1 @@
+Crear la mejor autoamtizacion para Comercio P2P en Binance, directo en la moneda Fiast VES y USDT, es decir el pas USDT/VES. PAra poder atuomatizar procesos hastas de apgos de ser neecsiario, calculos, oportunidades, control, gestion de capital y todo lo mejor para el proceso.

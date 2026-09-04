@@ -1,0 +1,226 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================================
+   Telecambios VE — Global CSS Variables & Base Styles
+   ================================================ */
+
+:root {
+  --telecambios-ve-primary:        #7c3aed;
+  --telecambios-ve-primary-light:  #a78bfa;
+  --telecambios-ve-secondary:      #d97706;
+  --telecambios-ve-secondary-light:#fbbf24;
+  --telecambios-ve-bg:             #07090f;
+  --telecambios-ve-surface:        #0d1117;
+  --telecambios-ve-border:         #1a2035;
+}
+
+body {
+  background-color: #07090f;
+  color: #f8fafc;
+}
+
+/* ===========================
+   THEME: telecambios-ve — Violet/Navy
+   =========================== */
+
+@keyframes telecambios-veGlowPulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(124,58,237,0.1), 0 0 20px rgba(124,58,237,0.05); }
+  50%       { box-shadow: 0 0 15px rgba(124,58,237,0.35), 0 0 50px rgba(124,58,237,0.12); }
+}
+@keyframes telecambios-veTextGlow {
+  0%, 100% { text-shadow: 0 0 6px rgba(124,58,237,0.3); }
+  50%       { text-shadow: 0 0 16px rgba(124,58,237,0.7), 0 0 35px rgba(124,58,237,0.25); }
+}
+@keyframes telecambios-veGridPulse {
+  0%, 100% { opacity: 0.025; }
+  50%       { opacity: 0.055; }
+}
+@keyframes telecambios-veScan {
+  0%   { top: 0%; opacity: 0; }
+  8%   { opacity: 0.7; }
+  92%  { opacity: 0.7; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes telecambios-veOrbit {
+  from { transform: rotate(0deg) translateX(12px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(12px) rotate(-360deg); }
+}
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.telecambios-ve-grid-bg {
+  background-image:
+    linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+  animation: telecambios-veGridPulse 8s ease-in-out infinite;
+}
+.telecambios-ve-glow-card {
+  animation: telecambios-veGlowPulse 5s ease-in-out infinite;
+  border: 1px solid rgba(124,58,237,0.12);
+}
+.telecambios-ve-glow-card:hover {
+  border-color: rgba(124,58,237,0.35);
+  box-shadow: 0 0 20px rgba(124,58,237,0.18), 0 0 60px rgba(124,58,237,0.06);
+}
+.telecambios-ve-neon-text   { animation: telecambios-veTextGlow 3.5s ease-in-out infinite; }
+.telecambios-ve-float       { animation: floatUp 4s ease-in-out infinite; }
+.telecambios-ve-scan-line   { animation: telecambios-veScan 5s ease-in-out infinite; }
+
+.telecambios-ve-shimmer-text {
+  background: linear-gradient(90deg, #a78bfa, #fbbf24, #a78bfa);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ================================
+   THEME: frank — Orange Crypto
+   ================================ */
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(251,146,60,0.1), 0 0 20px rgba(251,146,60,0.05); }
+  50%       { box-shadow: 0 0 10px rgba(251,146,60,0.3), 0 0 40px rgba(251,146,60,0.1); }
+}
+@keyframes gridPulse {
+  0%, 100% { opacity: 0.03; }
+  50%       { opacity: 0.06; }
+}
+@keyframes textGlow {
+  0%, 100% { text-shadow: 0 0 4px rgba(251,146,60,0.3); }
+  50%       { text-shadow: 0 0 12px rgba(251,146,60,0.6), 0 0 30px rgba(251,146,60,0.2); }
+}
+@keyframes scan {
+  0%   { top: 0%; opacity: 0; }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.8; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.crypto-grid-bg {
+  background-image:
+    linear-gradient(rgba(251,146,60,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(251,146,60,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridPulse 8s ease-in-out infinite;
+}
+.glow-card {
+  animation: glowPulse 4s ease-in-out infinite;
+  border: 1px solid rgba(251,146,60,0.1);
+}
+.glow-card:hover {
+  border-color: rgba(251,146,60,0.3);
+  box-shadow: 0 0 15px rgba(251,146,60,0.15), 0 0 45px rgba(251,146,60,0.05);
+}
+.neon-text { animation: textGlow 3s ease-in-out infinite; }
+
+/* ================================
+   THEME: rafa — Emerald Crypto
+   ================================ */
+
+@keyframes glowPulseRafa {
+  0%, 100% { box-shadow: 0 0 5px rgba(16,185,129,0.1), 0 0 20px rgba(16,185,129,0.05); }
+  50%       { box-shadow: 0 0 10px rgba(16,185,129,0.3), 0 0 40px rgba(16,185,129,0.1); }
+}
+@keyframes textGlowRafa {
+  0%, 100% { text-shadow: 0 0 4px rgba(16,185,129,0.3); }
+  50%       { text-shadow: 0 0 12px rgba(16,185,129,0.6), 0 0 30px rgba(16,185,129,0.2); }
+}
+.crypto-grid-bg-rafa {
+  background-image:
+    linear-gradient(rgba(16,185,129,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16,185,129,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridPulse 8s ease-in-out infinite;
+}
+.glow-card-rafa {
+  animation: glowPulseRafa 4s ease-in-out infinite;
+  border: 1px solid rgba(16,185,129,0.1);
+}
+.glow-card-rafa:hover {
+  border-color: rgba(16,185,129,0.3);
+  box-shadow: 0 0 15px rgba(16,185,129,0.15), 0 0 45px rgba(16,185,129,0.05);
+}
+.neon-text-rafa { animation: textGlowRafa 3s ease-in-out infinite; }
+
+/* ================================
+   THEME: jarvis — Neon Green Hacker
+   ================================ */
+
+@keyframes glowPulseJarvis {
+  0%, 100% { box-shadow: 0 0 5px rgba(0,255,65,0.1), 0 0 20px rgba(0,255,65,0.05); }
+  50%       { box-shadow: 0 0 15px rgba(0,255,65,0.35), 0 0 50px rgba(0,255,65,0.12); }
+}
+@keyframes textGlowJarvis {
+  0%, 100% { text-shadow: 0 0 6px rgba(0,255,65,0.3); }
+  50%       { text-shadow: 0 0 16px rgba(0,255,65,0.7), 0 0 35px rgba(0,255,65,0.25); }
+}
+@keyframes gridPulseJarvis {
+  0%, 100% { opacity: 0.025; }
+  50%       { opacity: 0.06; }
+}
+@keyframes scanlineJarvis {
+  0%   { top: 0%; opacity: 0; }
+  8%   { opacity: 0.5; }
+  92%  { opacity: 0.5; }
+  100% { top: 100%; opacity: 0; }
+}
+.jarvis-grid-bg {
+  background-image:
+    linear-gradient(rgba(0,255,65,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: gridPulseJarvis 6s ease-in-out infinite;
+}
+.glow-card-jarvis {
+  animation: glowPulseJarvis 4s ease-in-out infinite;
+  border: 1px solid rgba(0,255,65,0.1);
+}
+.glow-card-jarvis:hover {
+  border-color: rgba(0,255,65,0.3);
+  box-shadow: 0 0 15px rgba(0,255,65,0.15), 0 0 45px rgba(0,255,65,0.05);
+}
+.neon-text-jarvis { animation: textGlowJarvis 3s ease-in-out infinite; }
+
+/* ═══ Demo Mode Banner ═══ */
+.demo-banner {
+  background: linear-gradient(90deg, rgba(0,255,65,0.08), rgba(0,212,255,0.08), rgba(0,255,65,0.08));
+  border-bottom: 1px solid rgba(0,255,65,0.15);
+  padding: 10px 16px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #00ff41;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  z-index: 100;
+  position: relative;
+}
+.demo-banner a {
+  background: #00ff41;
+  color: #000;
+  padding: 4px 16px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.demo-banner a:hover {
+  background: #33ff66;
+  box-shadow: 0 0 15px rgba(0,255,65,0.4);
+}
